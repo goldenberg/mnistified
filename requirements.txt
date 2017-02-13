@@ -1,0 +1,19 @@
+-e git+ssh://git@github.com/enlitic/dblib@458decf#egg=dblib
+appdirs==1.4.0
+click==6.7
+argparse==1.2.1
+Flask==0.12
+itsdangerous==0.24
+Jinja2==2.9.5
+MarkupSafe==0.23
+marshmallow==2.10.5
+packaging==16.8
+pyparsing==2.1.10
+Pillow==2.6.1
+psycopg2==2.6.2
+pydicom==0.9.9
+PyYAML==3.11
+scikit-image==0.12.3
+six==1.10.0
+Werkzeug==0.11.15
+webargs==1.5.1
