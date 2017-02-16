@@ -8,11 +8,15 @@ np.random.seed(42)  # for reproducibility
 
 from keras.datasets import mnist
 from keras.models import Sequential
+from keras.models import load_model
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
 from keras.utils import np_utils
 from keras import backend as K
 
+import tensorflow as tf
+
+graph = tf.get_default_graph()
 
 class Model(object):
 
@@ -119,15 +123,23 @@ class CNNModel(Model):
           verbose=1, validation_data=(X_test, Y_test))
 
     def serialize(self, path):
-        self.model.save(path)
+        self.model.save_weights(path)
 
-    def deserialize(self, path):
-        self.model.load_model(path)
+    @classmethod
+    def from_hd5(cls, path):
+        m = CNNModel()
+        m._model = load_model(path)
+
+    def load_weights(self, path):
+        self.model.load_weights(path)
 
     def classify(self, img):
-        if img.ndims != 2:
+        if img.ndim != 2:
             raise ValueError("Expected a 2D, 28 x 28 image.")
         if img.shape != (MNIST_IMG_ROWS, MNIST_IMG_COLS):
             raise ValueError("Expected a 2D image. Got {}".format(img.shape))
 
-        return self.model.predict(img)
+        # TODO document
+        global graph
+        with graph.as_default():
+            return self.model.predict(np.array([[img]]))

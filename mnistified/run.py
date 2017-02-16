@@ -1,13 +1,20 @@
+import numpy as np
+
 from flask import Flask
+from flask import request
 from flask import send_file
 from flask.json import jsonify
 from mnistified import datasets
+from mnistified.model import CNNModel
 from PIL import Image
 from StringIO import StringIO
+import os.path
+
 app = Flask(__name__)
 
 mnist = datasets.MNIST()
-
+model = CNNModel()
+model.load_weights(os.path.join(os.path.dirname(__file__), '../model.hdf5'))
 
 @app.route('/status')
 def status():
@@ -17,7 +24,12 @@ def status():
 
 @app.route('/mnist/classify', methods=('POST',))
 def classify():
-    # prediction =
+
+    # model = CNNModel.from_hd5(os.path.join(os.path.dirname(__file__), '../model.hdf5'))
+    img = Image.open(StringIO(request.data))
+    img_array = np.array(img)
+    prediction = model.classify(img_array)
+
     return jsonify({
         'prediction': 9,
         'elapsed_time_ms': 3,
