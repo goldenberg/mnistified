@@ -5,6 +5,7 @@ from flask import Flask
 from flask import request
 from flask import send_file
 from flask.json import jsonify
+from werkzeug import exceptions
 from mnistified import datasets
 from mnistified.model import CNNModel
 from PIL import Image
@@ -37,12 +38,17 @@ def classify():
         'prediction': max_class,
         'elapsed_time_ms': elapsed_time.total_seconds() * 1000,
         'debug': {
-            'probabilities': prediction.tolist()
+            'probabilities': prediction.tolist()[0]
         }
     })
 
 @app.route('/mnist/image/<idx>')
 def get_image(idx):
+    # TODO: error check idx format
+    try:
+        img_array = mnist.get(int(idx))
+    except IndexError as e:
+        raise exceptions.NotFound(e)
     img = Image.fromarray(mnist.get(int(idx)))
     img_io = StringIO()
     img.save(img_io, 'JPEG')

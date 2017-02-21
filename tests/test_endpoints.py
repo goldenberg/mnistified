@@ -26,6 +26,10 @@ def test_classify(client, image7):
     res = client.post('/mnist/classify', data=image7)
     assert res.status_code == 200
     assert res.json['prediction'] == 3
+    assert 0 < res.json['elapsed_time_ms'] < 1000
+    assert res.json['debug'] == {
+        'probabilities': [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    }
 
 def test_classify_png(client, image7_png):
     res = client.post('/mnist/classify', data=image7_png)
