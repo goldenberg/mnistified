@@ -1,0 +1,50 @@
+# Pre-commit hooks managed by pre-commit.com
+
+-   repo: git://github.com/pre-commit/pre-commit-hooks
+    sha: v0.7.1
+    hooks:
+        # In order of least to most controversial :)
+    -   id: check-ast
+        description: Check that Python files are syntactically valid Python
+    -   id: check-json
+        description: Check that JSON files are valid
+    -   id: check-yaml
+        description: Check that YAML files are valid
+    -   id: check-merge-conflict
+        description: Check that you don't accidentally commit conflicting code (e.g. with >>>)
+
+    -   id: check-added-large-files
+        description: Prevent accidentally committing files >1MB to git
+        args: ['--maxkb=1024']
+
+    -   id: requirements-txt-fixer
+        description: Sort requirements.txt lexicographically
+
+    -   id: trailing-whitespace
+        description: Strip trailing whitespace from ends of lines
+    -   id: end-of-file-fixer
+        description: Add newline to end of file if it doesn't exist.
+
+    -   id: autopep8-wrapper
+        description: Automatically make some PEP 8 style fixes
+        # '--in-place is necessary if we add other arguments'
+        args: ['--in-place', '--max-line-length=99']
+
+    -   id: flake8
+        args: [--max-line-length=99]
+
+    -   id: debug-statements
+        description: Prevent committing pdb.set_trace() etc.
+
+-   repo: git://github.com/Lucas-C/pre-commit-hooks
+    sha: 0f5055d31f39ea3ac1f5335a0cca320200cd0c51
+    hooks:
+    -   id: forbid-tabs
+        description: Forbid tab characters from Javascript and Python files.
+        files: \.(js|jsx|py)
+
+-   repo: git://github.com/FalconSocial/pre-commit-python-sorter
+    sha: 1.0.4
+    hooks:
+    - id: python-import-sorter
+      args: ['--silent-overwrite']
