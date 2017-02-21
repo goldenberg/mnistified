@@ -20,6 +20,7 @@ import tensorflow as tf
 # See https://github.com/fchollet/keras/issues/2397#issuecomment-254919212
 graph = tf.get_default_graph()
 
+
 class Model(object):
 
     @abstractmethod
@@ -47,6 +48,7 @@ class RandomModel(Model):
 MNIST_IMG_ROWS = 28
 MNIST_IMG_COLS = 28
 MNIST_NB_CLASSES = 10
+
 
 class CNNModel(Model):
 
@@ -122,7 +124,7 @@ class CNNModel(Model):
         Y_test = np_utils.to_categorical(y_test, MNIST_NB_CLASSES)
 
         self.model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=num_epochs,
-          verbose=1, validation_data=(X_test, Y_test))
+                       verbose=1, validation_data=(X_test, Y_test))
 
     def serialize(self, path):
         self.model.save_weights(path)

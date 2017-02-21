@@ -18,11 +18,13 @@ mnist = datasets.MNIST()
 model = CNNModel()
 model.load_weights(os.path.join(os.path.dirname(__file__), '../model.hdf5'))
 
+
 @app.route('/status')
 def status():
     return jsonify({
         'status': 'ok'
     })
+
 
 @app.route('/mnist/classify', methods=('POST',))
 def classify():
@@ -41,6 +43,7 @@ def classify():
             'probabilities': prediction.tolist()[0]
         }
     })
+
 
 @app.route('/mnist/image/<idx>')
 def get_image(idx):

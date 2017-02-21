@@ -1,5 +1,6 @@
 from setuptools import setup
 
+
 def parse_requirements(filename):
     with open(filename) as f:
         return f.readlines()
