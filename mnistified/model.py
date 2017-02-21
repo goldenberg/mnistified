@@ -1,47 +1,22 @@
-from __future__ import print_function
-from abc import abstractmethod
-import math
-import random
+import logging
 
 import numpy as np
+import tensorflow as tf
+from keras import backend as K
+from keras.datasets import mnist
+from keras.layers import (Activation, Convolution2D, Dense, Dropout, Flatten,
+                          MaxPooling2D)
+from keras.models import Sequential
+from keras.utils import np_utils
+
 np.random.seed(42)  # for reproducibility
 
-from keras.datasets import mnist
-from keras.models import Sequential
-from keras.models import load_model
-from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, MaxPooling2D
-from keras.utils import np_utils
-from keras import backend as K
-
-import tensorflow as tf
 
 # Use a global Tensorflow graph, so that it is reused in the request context.
 # See https://github.com/fchollet/keras/issues/2397#issuecomment-254919212
 graph = tf.get_default_graph()
 
-
-class Model(object):
-
-    @abstractmethod
-    def initialize(self):
-        pass
-
-    @abstractmethod
-    def classify(self, img):
-        pass
-
-    def info(self):
-        return {}
-
-
-class RandomModel(Model):
-
-    def initialize(self):
-        pass
-
-    def classify(self, img):
-        return random.randint(0, 9)
+log = logging.getLogger(__file__)
 
 
 # input image dimensions
@@ -50,18 +25,30 @@ MNIST_IMG_COLS = 28
 MNIST_NB_CLASSES = 10
 
 
-class CNNModel(Model):
+class CNNModel(object):
+    """Convolutional Neural Network model for classifying MNIST images.
 
-    def initialize(self):
-        pass
+    Copied from the examples distributed with Keras:
+    https://raw.githubusercontent.com/fchollet/keras/master/examples/mnist_cnn.py
+    """
 
-    @property
-    def model(self):
-        if hasattr(self, '_model'):
-            return self._model
+    def __init__(self):
+        super(CNNModel, self).__init__()
+        self.model = self._define_model()
+        # TODO time it?
 
-        nb_epoch = 12
+        log.debug('Compiling TensorFlow model')
+        self.model.compile(loss='categorical_crossentropy',
+                           optimizer='adadelta',
+                           metrics=['accuracy'])
+        log.debug('Compiling TensorFlow model')
 
+    def _define_model(self):
+        """Define the convolutional model for classifying 28 x 28 digits.
+
+        Does NOT compile the model since this is computationally expensive,
+        so is done explicitly above.
+        """
         # number of convolutional filters to use
         nb_filters = 32
         # size of pooling area for max pooling
@@ -91,33 +78,28 @@ class CNNModel(Model):
         model.add(Dense(MNIST_NB_CLASSES))
         model.add(Activation('softmax'))
 
-        model.compile(loss='categorical_crossentropy',
-                      optimizer='adadelta',
-                      metrics=['accuracy'])
-
-        self._model = model
-        return self._model
+        return model
 
     def train(self, batch_size=128, num_epochs=12):
-        # the data, shuffled and split between train and test sets
+        """Train the model using specified batch size and epochs."""
+
+        # Load the data, shuffled and split between train and test sets
         (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
         if K.image_dim_ordering() == 'th':
             X_train = X_train.reshape(X_train.shape[0], 1, MNIST_IMG_ROWS, MNIST_IMG_COLS)
             X_test = X_test.reshape(X_test.shape[0], 1, MNIST_IMG_ROWS, MNIST_IMG_COLS)
-            input_shape = (1, MNIST_IMG_ROWS, MNIST_IMG_COLS)
         else:
             X_train = X_train.reshape(X_train.shape[0], MNIST_IMG_ROWS, MNIST_IMG_COLS, 1)
             X_test = X_test.reshape(X_test.shape[0], MNIST_IMG_ROWS, MNIST_IMG_COLS, 1)
-            input_shape = (MNIST_IMG_ROWS, MNIST_IMG_COLS, 1)
 
         X_train = X_train.astype('float32')
         X_test = X_test.astype('float32')
         X_train /= 255
         X_test /= 255
-        print('X_train shape:', X_train.shape)
-        print(X_train.shape[0], 'train samples')
-        print(X_test.shape[0], 'test samples')
+        log.debug('X_train shape:', X_train.shape)
+        log.debug(X_train.shape[0], 'train samples')
+        log.debug(X_test.shape[0], 'test samples')
 
         # convert class vectors to binary class matrices
         Y_train = np_utils.to_categorical(y_train, MNIST_NB_CLASSES)
@@ -127,24 +109,41 @@ class CNNModel(Model):
                        verbose=1, validation_data=(X_test, Y_test))
 
     def serialize(self, path):
+        """Save the model's weights to the specified file path."""
         self.model.save_weights(path)
 
     @classmethod
-    def from_hd5(cls, path):
+    def from_hd5_weights(cls, path):
         m = CNNModel()
-        m._model = load_model(path)
+        m.load_weights(path)
 
     def load_weights(self, path):
+        """Load serialized trained weights for this model.
+
+        Args:
+            path - path to an HDF5 file of serialized weights.
+        """
         self.model.load_weights(path)
 
     def classify(self, img):
+        """Classify an input image of a handwritten digit from the MNIST dataset.
+
+        Args:
+            img - 2D 28 x 28 pixel image, as a numpy array
+
+        Returns:
+            Integer in [0, 9]
+
+        Raises:
+            ValueError if the input is the wrong dimensions
+        """
         if img.ndim != 2:
             raise ValueError("Expected a 2D, 28 x 28 image.")
         if img.shape != (MNIST_IMG_ROWS, MNIST_IMG_COLS):
             raise ValueError("Expected a 2D image. Got {}".format(img.shape))
 
         # Convert the input into a 4D tensor, which the model expects.
-        # The four components are: image index, channel, x, y
+        # The four dimensions are: image index, channel, x, y
         # In a "real" implementation, we'd likely want to bulk process images on the
         # first dimension in order to take advantage of the GPUs parallelism.
         model_input = np.array([[img]])
