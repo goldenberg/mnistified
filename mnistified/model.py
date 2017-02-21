@@ -16,6 +16,8 @@ from keras import backend as K
 
 import tensorflow as tf
 
+# Use a global Tensorflow graph, so that it is reused in the request context.
+# See https://github.com/fchollet/keras/issues/2397#issuecomment-254919212
 graph = tf.get_default_graph()
 
 class Model(object):
@@ -139,7 +141,13 @@ class CNNModel(Model):
         if img.shape != (MNIST_IMG_ROWS, MNIST_IMG_COLS):
             raise ValueError("Expected a 2D image. Got {}".format(img.shape))
 
-        # TODO document
+        # Convert the input into a 4D tensor, which the model expects.
+        # The four components are: image index, channel, x, y
+        # In a "real" implementation, we'd likely want to bulk process images on the
+        # first dimension in order to take advantage of the GPUs parallelism.
+        model_input = np.array([[img]])
+
+        # Use the global TF graph defined above.
         global graph
         with graph.as_default():
-            return self.model.predict(np.array([[img]]))
+            return self.model.predict(model_input)

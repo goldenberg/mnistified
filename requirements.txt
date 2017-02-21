@@ -1,7 +1,8 @@
--e git+ssh://git@github.com/enlitic/dblib@458decf#egg=dblib
 appdirs==1.4.0
 click==6.7
 argparse==1.2.1
+keras==1.2.2
+tensorflow==1.0.0
 Flask==0.12
 h5py==2.6.0
 itsdangerous==0.24
