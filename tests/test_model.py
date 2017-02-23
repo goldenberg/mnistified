@@ -22,10 +22,22 @@ def untrained_model():
 def mnist():
     return MNIST()
 
+
+def test_model_definition(untrained_model):
+    # Just some basic tests that the model has the rough architecture we expect
+
+    assert len(untrained_model.model.layers) == 12
+    assert isinstance(untrained_model.model.layers[0], Convolution2D)
+    assert isinstance(untrained_model.model.layers[1], Activation)
+
+    # Check that the last layer is a softmax with 10 output nodes
+    assert isinstance(untrained_model.model.layers[-1], Activation)
+    assert untrained_model.model.layers[-1].activation.func_name == 'softmax'
+    assert untrained_model.model.layers[-1].output_shape == (None, 10)
+
+
 # Test that the untrained model behaves deterministically on toy input.
 # We'd expect these tests to fail if the model architecture changes.
-
-
 def test_untrained_model_zeros(untrained_model):
     assert_array_almost_equal(
         untrained_model.classify(np.zeros((28, 28))),
@@ -39,8 +51,8 @@ def test_untrained_model_ones(untrained_model):
     assert_array_almost_equal(
         untrained_model.classify(np.ones((28, 28))),
         np.array([
-            0.124937,  0.106037,  0.099581,  0.087444,  0.092687,  0.070209,
-            0.112726,  0.065086,  0.110448,  0.130845
+            0.092202,  0.124983,  0.09672,  0.109583,  0.086648,  0.091914,
+            0.113914,  0.102022,  0.090874,  0.091139
         ])
     )
 
@@ -81,16 +93,3 @@ def test_model_evaluation(model, mnist, idx, label):
         model.classify(mnist.get_test_image(idx)),
         expected_probabilities
     )
-
-
-def test_model_definition(model):
-    # Just some basic tests that the model has the rough architecture we expect
-
-    assert len(model.model.layers) == 12
-    assert isinstance(model.model.layers[0], Convolution2D)
-    assert isinstance(model.model.layers[1], Activation)
-
-    # Check that the last layer is a softmax with 10 output nodes
-    assert isinstance(model.model.layers[-1], Activation)
-    assert model.model.layers[-1].activation.func_name == 'softmax'
-    assert model.model.layers[-1].output_shape == (None, 10)
