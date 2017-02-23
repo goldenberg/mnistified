@@ -87,6 +87,7 @@ def test_trained_model_ones(model):
     (5000, 3),
 ])
 def test_model_evaluation(model, mnist, idx, label):
+    """Test some of the test images using our model."""
     expected_probabilities = np.zeros((10,))
     expected_probabilities[label] = 1.0
     assert_array_almost_equal(

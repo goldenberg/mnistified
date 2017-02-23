@@ -143,33 +143,31 @@ Unit and integration tests are run via `tox` which can also be run via `make
 test`. `tox` will run the tests in a dedicated virtual environment, and also
 compute a test coverage report.
 
-# TODO change coverage report
 ```
 $ make test
 tox
 ...
-collected 21 items
+collected 25 items
 
 tests/test_endpoints.py::test_status PASSED
 tests/test_endpoints.py::test_get_images[7] PASSED
 tests/test_endpoints.py::test_get_images[42] PASSED
-...
+....
 
 ---------- coverage: platform darwin, python 2.7.13-final-0 ----------
-Name                      Stmts   Miss  Cover
----------------------------------------------
-mnistified/__init__.py        0      0   100%
-mnistified/app.py            57     14    75%
-mnistified/datasets.py       10      1    90%
-mnistified/mnist_cnn.py      51     51     0%
-mnistified/model.py          76     21    72%
-mnistified/train.py          13     13     0%
----------------------------------------------
-TOTAL                       207    100    52%
+Name                     Stmts   Miss  Cover
+--------------------------------------------
+mnistified/__init__.py       0      0   100%
+mnistified/app.py           57     12    79%
+mnistified/datasets.py      10      1    90%
+mnistified/model.py         76     21    72%
+mnistified/train.py         13     13     0%
+--------------------------------------------
+TOTAL                      156     47    70%
 
 
-======================================================== 21 passed in 2.40 seconds ========================================================
-_________________________________________________________________ summary _________________________________________________________________
+========================== 25 passed in 8.89 seconds ===========================
+___________________________________ summary ____________________________________
   py27: commands succeeded
   congratulations :)
 ```
