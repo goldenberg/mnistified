@@ -67,7 +67,7 @@ as the probabilities outputted by the model for debugging. Some sample images
 are available at `tests/fixtures/mnist` in various file formats.
 
 ```shell
-curl --data-binary @tests/fixtures/mnist/7.png -X POST "http://127.0.0.1:5000/mnist/classify" --header "Content-Type:image/png"
+./mnistified $ curl --data-binary @tests/fixtures/mnist/7.png -X POST "http://127.0.0.1:5000/mnist/classify" --header "Content-Type:image/png"
 {
   "debug": {
     "probabilities": [
@@ -179,7 +179,7 @@ As seen in the coverage report, the training code isn't currently tested. It's f
 computationally expensive to retrain on every run, but we could mock out parts of it
 or only test training on a small input for a single epoch.
 
-# Next steps
+# Next steps and ideas
 
 * The raw binary weights file is checked into Git for simplicity. They should be
 managed using [Git LFS](https://git-lfs.github.com/) or another system for
