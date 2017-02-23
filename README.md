@@ -1,7 +1,7 @@
 MNISTified
 ==========
 
-MNISTified is an REST service that classifies images of handwritten digits from
+MNISTified is a REST service that classifies images of handwritten digits from
 the MNIST dataset.
 
 
