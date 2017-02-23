@@ -13,24 +13,24 @@ virtual environment.
 
 ## Service
 Setup and install the service
-```
+```shellshell
 ./mnistified $ virtualenv venv
 ./mnistified $ make
 pip install -r requirements.txt
 ....
-```
+```shell
 
 Then, to start to the service, run `make service`.
-```
+```shell
 ./mnistified $ make service
 PYTHONPATH=./ FLASK_APP=mnistified/app.py flask run
 Using TensorFlow backend
  * Serving Flask app "mnistified.app"
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
-```
+```shell
 
 Confirm that the service is up, and the model loaded, by querying `/status`:
-```
+```shell
 $ curl http://127.0.0.1:5000/status
 {
     "model": {
@@ -40,21 +40,22 @@ $ curl http://127.0.0.1:5000/status
     },
     "status": "ok"
 }
-```
+```shell
 
 ## Dataset
 The test examples from the MNIST dataset are available at
 `http://127.0.0.1:5000/mnist/image/<idx>`. For example, you should be able to
-open this URL in a browser and view a JPEG of a handwritten image of a 4
-`http://127.0.0.1:5000/mnist/image/42`.
+open `http://127.0.0.1:5000/mnist/image/42` in a browser and view a JPEG of a
+handwritten image of a a.4
+
 
 And view the label
-```
+```shell
 $ curl "http://127.0.0.1:5000/mnist/label/42"
 {
   "label": 4
 }
-```
+```shell
 ## Classification
 
 Images can be classified with two endpoints, either by POSTing a 28x28 image file to
@@ -64,7 +65,7 @@ We output the prediction, the elapsed wall time to evaluate the model, as well
 as the probabilities outputted by the model for debugging. Some sample images
 are available at `tests/fixtures/mnist` in various file formats.
 
-```
+```shell
 curl --data-binary @tests/fixtures/mnist/7.png -X POST "http://127.0.0.1:5000/mnist/classify" --header "Content-Type:image/png"
 {
   "debug": {
@@ -84,10 +85,10 @@ curl --data-binary @tests/fixtures/mnist/7.png -X POST "http://127.0.0.1:5000/mn
   "elapsed_time_ms": 41.961,
   "prediction": 3
 }
-```
+```shell
 
 Or by specifying an image index:
-```
+```shell
 $ curl "http://127.0.0.1:5000/mnist/classify/42"
 {
   "debug": {
@@ -107,6 +108,7 @@ $ curl "http://127.0.0.1:5000/mnist/classify/42"
   "elapsed_time_ms": 21.950999999999997,
   "prediction": 4
 }
+```shell
 
 ## Training
 
@@ -117,7 +119,7 @@ fast-train`.
 
 Or, the `train.py` script can be used:
 
-```PYTHONPATH=./ python mnistified/train.py --help
+```shellPYTHONPATH=./ python mnistified/train.py --help
 Using TensorFlow backend.
 usage: train.py [-h] [--weights WEIGHTS] [--num-epochs NUM_EPOCHS]
                 [--batch-size BATCH_SIZE]
@@ -131,7 +133,7 @@ optional arguments:
                         Number of epochs to train for.
   --batch-size BATCH_SIZE
                         Mini batch size for training.
-```
+```shell
 
 Each epoch takes several minutes on a consumer laptop (e.g. Macbook Pro) without
 a high end GPU.
@@ -142,7 +144,7 @@ Unit and integration tests are run via `tox` which can also be run via `make
 test`. `tox` will run the tests in a dedicated virtual environment, and also
 compute a test coverage report.
 
-```
+```shell
 $ make test
 tox
 ...
@@ -169,7 +171,7 @@ TOTAL                      156     47    70%
 ___________________________________ summary ____________________________________
   py27: commands succeeded
   congratulations :)
-```
+```shell
 
 
 # Next steps
