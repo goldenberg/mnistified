@@ -211,12 +211,15 @@ representative set of data, and compares it to known baselines.
 Serving](https://tensorflow.github.io/serving/) might be a good choice to manage
 the retraining lifecycle.
 
+* I thought it'd be cool to expose the output of some intermediate layers in the
+debug section of the response, as described
+[here](https://keras.io/getting-started/faq/#how-can-i-obtain-the-output-of-an-intermediate-layer)
+but ran out of time. If this turns out to be expensive, e.g. by rerunning
+multiple versions of the model as suggested in the Keras FAQ, we might hide it
+behind a `verbose=1` URL parameter.
+
 * The API might be a bit cleaner by swapping the order of the path components.
 If we changed the format from `/mnist/image/<idx>`, `/mnist/classify/<idx>` etc.
 to `/mnist/<idx>/image`, `/mnist/<idx>/classify`, it would emphasize the
 resource being specified, and then the actions to take on that resource. But I
 wanted to make it consistent with the URL specified in the instructions.
-
-# TODO
-* The argument parsing and validation is a bit of a mess, but should return
-  reasonable status codes. In the past I've used [webargs]()
