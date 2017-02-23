@@ -42,9 +42,27 @@ $ curl http://127.0.0.1:5000/status
 }
 ```
 
+## Dataset
+The test examples from the MNIST dataset are available at
+`http://127.0.0.1:5000/mnist/image/<idx>`. For example, you should be able to
+open this URL in a browser and view a JPEG of a handwritten image of a 4
+`http://127.0.0.1:5000/mnist/image/42`.
+
+And view the label
+```
+$ curl "http://127.0.0.1:5000/mnist/label/42"
+{
+  "label": 4
+}
+```
 ## Classification
 
-Classify an input image:
+Images can be classified with two endpoints, either by POSTing a 28x28 image file to
+`http://127.0.0.1:5000/mnist/classify` or by specifying an image index:
+
+We output the prediction, the elapsed wall time to evaluate the model, as well
+as the probabilities outputted by the model for debugging. Some sample images
+are available at `tests/fixtures/mnist` in various file formats.
 
 TODO: make sure paths are right
 ```
@@ -68,6 +86,28 @@ curl --data-binary @tests/fixtures/mnist/7.png -X POST "http://127.0.0.1:5000/mn
   "prediction": 3
 }
 ```
+
+Or by specifying an image index:
+```
+$ curl "http://127.0.0.1:5000/mnist/classify/42"
+{
+  "debug": {
+    "probabilities": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "elapsed_time_ms": 21.950999999999997,
+  "prediction": 4
+}
 
 ## Training
 
@@ -99,8 +139,8 @@ a high end GPU.
 
 # Testing
 
-Unit and integration tests are run via `tox` which can also be run with a make
-target. `tox` will run the tests in a dedicated virtual environment, and also
+Unit and integration tests are run via `tox` which can also be run via `make
+test`. `tox` will run the tests in a dedicated virtual environment, and also
 compute a test coverage report.
 
 # TODO change coverage report
@@ -157,3 +197,13 @@ should be able to parallelize model execution extremely well.
 * Depending on the product motivation, we'd likely want to be able to load
 multiple versions of the MNIST models: either with different sets of weights or
 different architectures or both.
+
+* The current implementation verifies that the model is working as expected by
+executing unit tests that classify known images. If we expect the weights to be
+regularly updated, unit tests are probably not the right implementation for QA.
+Instead, we'd implement a QA process that verifies the model's output on a
+representative set of data, and compares it to known baselines.
+
+* For a pure TensorFlow environment, [Tensorflow
+Serving](https://tensorflow.github.io/serving/) might be a good choice to manage
+the retraining lifecycle.

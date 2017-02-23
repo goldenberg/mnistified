@@ -1,12 +1,11 @@
 import datetime
-import os.path
 from io import BytesIO
 
 import numpy as np
 from flask import Flask, request, send_file
 from flask.json import jsonify
 from mnistified import datasets
-from mnistified.model import CNNModel
+from mnistified.model import MNIST_DEFAULT_WEIGHTS_PATH, CNNModel
 from PIL import Image
 from werkzeug import exceptions
 
@@ -19,7 +18,7 @@ mnist = datasets.MNIST()
 model = CNNModel()
 
 # TODO: config this?
-model.load_weights(os.path.join(os.path.dirname(__file__), '../model.hdf5'))
+model.load_weights(MNIST_DEFAULT_WEIGHTS_PATH)
 
 
 @app.route('/status')
@@ -38,7 +37,8 @@ def status():
 
 
 @app.route('/mnist/classify', methods=('POST',))
-def classify():
+@app.route('/mnist/classify/<idx>', methods=('GET',))
+def classify(idx=None):
     """Classify an image passed in the POST request body.
 
     Request body:
@@ -51,13 +51,22 @@ def classify():
     """
     start_time = datetime.datetime.now()
 
+    if request.method == 'POST':
+        try:
+            img = Image.open(BytesIO(request.data))
+            img_array = np.array(img)
+        except (ValueError, IOError) as e:
+            raise exceptions.BadRequest(e)
+    elif request.method == 'GET':
+        try:
+            img_array = mnist.get_test_image(int(idx))
+        except IndexError as e:
+            raise exceptions.NotFound(e)
+
     try:
-        img = Image.open(BytesIO(request.data))
-        img_array = np.array(img)
         prediction = model.classify(img_array)
     except ValueError as e:
         raise exceptions.BadRequest(e)
-
     max_class = np.argmax(prediction)
     elapsed_time = datetime.datetime.now() - start_time
 
@@ -65,7 +74,7 @@ def classify():
         'prediction': max_class,
         'elapsed_time_ms': elapsed_time.total_seconds() * 1000,
         'debug': {
-            'probabilities': prediction.tolist()[0]
+            'probabilities': prediction.tolist()
         }
     })
 
@@ -81,13 +90,15 @@ def get_image(idx):
 
     Status Codes:
         200: JPEG encoded image response
+        400: BadRequest if the index can't be parsed
         404: File Not Found because of invalid index
     """
-    # TODO: error check idx format
     try:
-        img_array = mnist.get(int(idx))
+        img_array = mnist.get_test_image(int(idx))
     except IndexError as e:
         raise exceptions.NotFound(e)
+    except ValueError as e:
+        raise exceptions.BadRequest(e)
 
     img = Image.fromarray(img_array)
     img_io = BytesIO()
@@ -95,3 +106,29 @@ def get_image(idx):
     img_io.seek(0)
 
     return send_file(img_io, mimetype='image/jpeg')
+
+
+@app.route('/mnist/label/<idx>')
+def get_image_label(idx):
+    """Access the label of individual image in the MNIST dataset.
+
+    The dataset is deterministcally shuffled, so indices will be consistent.
+
+    Path parameters:
+        idx - integer index in the shuffled dataset
+
+    Status Codes:
+        200: JPEG encoded image response
+        400: BadRequest if the index can't be parsed
+        404: File Not Found because of invalid index
+    """
+    try:
+        img_label = mnist.get_test_label(int(idx))
+    except IndexError as e:
+        raise exceptions.NotFound(e)
+    except ValueError as e:
+        raise exceptions.BadRequest(e)
+
+    return jsonify({
+        'label': img_label
+    })

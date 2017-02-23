@@ -1,4 +1,5 @@
 import logging
+import os.path
 
 import numpy as np
 import tensorflow as tf
@@ -24,6 +25,8 @@ MNIST_IMG_ROWS = 28
 MNIST_IMG_COLS = 28
 MNIST_NB_CLASSES = 10
 
+MNIST_DEFAULT_WEIGHTS_PATH = os.path.join(os.path.dirname(__file__), '../data/weights.hdf5')
+
 
 class CNNModel(object):
     """Convolutional Neural Network model for classifying MNIST images.
@@ -35,13 +38,11 @@ class CNNModel(object):
     def __init__(self):
         super(CNNModel, self).__init__()
         self.model = self._define_model()
-        # TODO time it?
-
-        log.debug('Compiling TensorFlow model')
+        log.info('Compiling TensorFlow model')
         self.model.compile(loss='categorical_crossentropy',
                            optimizer='adadelta',
                            metrics=['accuracy'])
-        log.debug('Compiling TensorFlow model')
+        log.info('Finished compiling TensorFlow model')
 
     def _define_model(self):
         """Define the convolutional model for classifying 28 x 28 digits.
@@ -151,4 +152,4 @@ class CNNModel(object):
         # Use the global TF graph defined above.
         global graph
         with graph.as_default():
-            return self.model.predict(model_input)
+            return self.model.predict(model_input)[0]
