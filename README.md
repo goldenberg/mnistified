@@ -15,6 +15,7 @@ virtual environment.
 Setup and install the service
 ```shell
 ./mnistified $ virtualenv venv
+./mnistified $ source venv/bin/activate
 ./mnistified $ make
 pip install -r requirements.txt
 ....
