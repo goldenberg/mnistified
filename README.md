@@ -147,30 +147,29 @@ compute a test coverage report.
 ```
 $ make test
 tox
-py27 create: /Users/bgoldenberg/code/local/mnistified/.tox/py27
-py27 installdeps: -rrequirements.txt, -rrequirements_test.txt
 ...
+collected 21 items
+
 tests/test_endpoints.py::test_status PASSED
-tests/test_endpoints.py::test_get_image PASSED
-tests/test_endpoints.py::test_get_missing_image PASSED
-tests/test_endpoints.py::test_classify PASSED
-tests/test_endpoints.py::test_classify_png PASSED
+tests/test_endpoints.py::test_get_images[7] PASSED
+tests/test_endpoints.py::test_get_images[42] PASSED
+...
 
 ---------- coverage: platform darwin, python 2.7.13-final-0 ----------
 Name                      Stmts   Miss  Cover
 ---------------------------------------------
 mnistified/__init__.py        0      0   100%
-mnistified/app.py            37      2    95%
-mnistified/datasets.py        8      0   100%
+mnistified/app.py            57     14    75%
+mnistified/datasets.py       10      1    90%
 mnistified/mnist_cnn.py      51     51     0%
-mnistified/model.py          74     22    70%
+mnistified/model.py          76     21    72%
 mnistified/train.py          13     13     0%
 ---------------------------------------------
-TOTAL                       183     88    52%
+TOTAL                       207    100    52%
 
 
-======================== 5 passed in 0.10 seconds =========================
-_________________________________ summary _________________________________
+======================================================== 21 passed in 2.40 seconds ========================================================
+_________________________________________________________________ summary _________________________________________________________________
   py27: commands succeeded
   congratulations :)
 ```
@@ -184,7 +183,8 @@ distributing large binary files. It might also make sense to track the testing
 images using Git LFS.
 
 * For a "production deployment", we would run multiple worker processes, e.g.
-managed by [uwsgi](https://uwsgi-docs.readthedocs.io/en/latest/).
+managed by [uwsgi](https://uwsgi-docs.readthedocs.io/en/latest/), likely proxied
+through nginx or Apache.
 
 * Depending on the environment, it may be better to install Tensorflow and
 Keras as system packages or from source instead of via `pip` so they take
@@ -207,3 +207,11 @@ representative set of data, and compares it to known baselines.
 * For a pure TensorFlow environment, [Tensorflow
 Serving](https://tensorflow.github.io/serving/) might be a good choice to manage
 the retraining lifecycle.
+
+* The API might be a bit cleaner by swapping the order of the path components.
+If we changed the format from `/mnist/image/<idx>`, `/mnist/classify/<idx>` etc.
+to `/mnist/<idx>/image`, `/mnist/<idx>/classify`, it would emphasize the
+resource being specified, and then the actions to take on that resource. But I
+wanted to make it consistent with the URL specified in the instructions.
+
+* The argument parsing and validation is a bit of a mess, but should return reasonable status codes. In the past I've used [webargs]

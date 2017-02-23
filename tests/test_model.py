@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 from keras.layers import Activation, Convolution2D
+from mnistified.datasets import MNIST
 from mnistified.model import MNIST_DEFAULT_WEIGHTS_PATH, CNNModel
 from numpy.testing import assert_array_almost_equal
 
@@ -17,8 +18,13 @@ def untrained_model():
     return CNNModel()
 
 
+@pytest.fixture
+def mnist():
+    return MNIST()
+
 # Test that the untrained model behaves deterministically on toy input.
 # We'd expect these tests to fail if the model architecture changes.
+
 
 def test_untrained_model_zeros(untrained_model):
     assert_array_almost_equal(
@@ -60,6 +66,20 @@ def test_trained_model_ones(model):
             0.431459,  0.01586,  0.021785,  0.036961,  0.004694,  0.012518,
             0.159873,  0.005454,  0.303411,  0.007984
         ])
+    )
+
+
+@pytest.mark.parametrize('idx,label', [
+    (7, 9),
+    (42, 4),
+    (5000, 3),
+])
+def test_model_evaluation(model, mnist, idx, label):
+    expected_probabilities = np.zeros((10,))
+    expected_probabilities[label] = 1.0
+    assert_array_almost_equal(
+        model.classify(mnist.get_test_image(idx)),
+        expected_probabilities
     )
 
 

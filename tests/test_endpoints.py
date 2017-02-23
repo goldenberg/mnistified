@@ -32,6 +32,11 @@ def test_get_missing_image(client):
     assert res.status_code == 404
 
 
+def test_get_non_integer_image(client):
+    res = client.get('/mnist/image/foobar')
+    assert res.status_code == 400
+
+
 @pytest.mark.parametrize('fname,expected_label', [
     ('mnist/7.jpg', 9),
     ('mnist/7.png', 9),
