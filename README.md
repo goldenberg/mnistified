@@ -13,12 +13,12 @@ virtual environment.
 
 ## Service
 Setup and install the service
-```shellshell
+```shell
 ./mnistified $ virtualenv venv
 ./mnistified $ make
 pip install -r requirements.txt
 ....
-```shell
+```
 
 Then, to start to the service, run `make service`.
 ```shell
@@ -27,7 +27,7 @@ PYTHONPATH=./ FLASK_APP=mnistified/app.py flask run
 Using TensorFlow backend
  * Serving Flask app "mnistified.app"
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
-```shell
+```
 
 Confirm that the service is up, and the model loaded, by querying `/status`:
 ```shell
@@ -40,7 +40,7 @@ $ curl http://127.0.0.1:5000/status
     },
     "status": "ok"
 }
-```shell
+```
 
 ## Dataset
 The test examples from the MNIST dataset are available at
@@ -55,7 +55,7 @@ $ curl "http://127.0.0.1:5000/mnist/label/42"
 {
   "label": 4
 }
-```shell
+```
 ## Classification
 
 Images can be classified with two endpoints, either by POSTing a 28x28 image file to
@@ -85,7 +85,7 @@ curl --data-binary @tests/fixtures/mnist/7.png -X POST "http://127.0.0.1:5000/mn
   "elapsed_time_ms": 41.961,
   "prediction": 3
 }
-```shell
+```
 
 Or by specifying an image index:
 ```shell
@@ -108,7 +108,7 @@ $ curl "http://127.0.0.1:5000/mnist/classify/42"
   "elapsed_time_ms": 21.950999999999997,
   "prediction": 4
 }
-```shell
+```
 
 ## Training
 
@@ -133,7 +133,7 @@ optional arguments:
                         Number of epochs to train for.
   --batch-size BATCH_SIZE
                         Mini batch size for training.
-```shell
+```
 
 Each epoch takes several minutes on a consumer laptop (e.g. Macbook Pro) without
 a high end GPU.
@@ -171,7 +171,7 @@ TOTAL                      156     47    70%
 ___________________________________ summary ____________________________________
   py27: commands succeeded
   congratulations :)
-```shell
+```
 
 
 # Next steps
@@ -213,4 +213,6 @@ to `/mnist/<idx>/image`, `/mnist/<idx>/classify`, it would emphasize the
 resource being specified, and then the actions to take on that resource. But I
 wanted to make it consistent with the URL specified in the instructions.
 
-* The argument parsing and validation is a bit of a mess, but should return reasonable status codes. In the past I've used [webargs]
+# TODO
+* The argument parsing and validation is a bit of a mess, but should return
+  reasonable status codes. In the past I've used [webargs]()
