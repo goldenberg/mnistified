@@ -45,7 +45,7 @@ $ curl http://127.0.0.1:5000/status
 ## Dataset
 The test examples from the MNIST dataset are available at
 `http://127.0.0.1:5000/mnist/image/<idx>`. For example, you should be able to
-open `http://127.0.0.1:5000/mnist/image/42` in a browser and view a JPEG of a
+open [http://127.0.0.1:5000/mnist/image/42](http://127.0.0.1:5000/mnist/image/42) in a browser and view a JPEG of a
 handwritten image of a a.4
 
 
@@ -119,7 +119,8 @@ fast-train`.
 
 Or, the `train.py` script can be used:
 
-```shellPYTHONPATH=./ python mnistified/train.py --help
+```shell
+PYTHONPATH=./ python mnistified/train.py --help
 Using TensorFlow backend.
 usage: train.py [-h] [--weights WEIGHTS] [--num-epochs NUM_EPOCHS]
                 [--batch-size BATCH_SIZE]
@@ -148,31 +149,34 @@ compute a test coverage report.
 $ make test
 tox
 ...
-collected 25 items
+collected 27 items
 
 tests/test_endpoints.py::test_status PASSED
 tests/test_endpoints.py::test_get_images[7] PASSED
 tests/test_endpoints.py::test_get_images[42] PASSED
-....
+...
 
 ---------- coverage: platform darwin, python 2.7.13-final-0 ----------
 Name                     Stmts   Miss  Cover
 --------------------------------------------
 mnistified/__init__.py       0      0   100%
-mnistified/app.py           57     12    79%
-mnistified/datasets.py      10      1    90%
+mnistified/app.py           58      7    88%
+mnistified/datasets.py      10      0   100%
 mnistified/model.py         76     21    72%
 mnistified/train.py         13     13     0%
 --------------------------------------------
-TOTAL                      156     47    70%
+TOTAL                      157     41    74%
 
 
-========================== 25 passed in 8.89 seconds ===========================
+========================== 27 passed in 25.28 seconds ==========================
 ___________________________________ summary ____________________________________
   py27: commands succeeded
   congratulations :)
 ```
 
+As seen in the coverage report, the training code isn't currently tested. It's far too
+computationally expensive to retrain on every run, but we could mock out parts of it
+or only test training on a small input for a single epoch.
 
 # Next steps
 

@@ -7,6 +7,8 @@ from flask.json import jsonify
 from mnistified import datasets
 from mnistified.model import MNIST_DEFAULT_WEIGHTS_PATH, CNNModel
 from PIL import Image
+from webargs import fields
+from webargs.flaskparser import use_kwargs
 from werkzeug import exceptions
 
 app = Flask(__name__)
@@ -39,6 +41,7 @@ def status():
 
 @app.route('/mnist/classify', methods=('POST',))
 @app.route('/mnist/classify/<idx>', methods=('GET',))
+@use_kwargs({'idx': fields.Integer(location='view_args', minimum=0, required=False)})
 def classify(idx=None):
     """Classify an image passed in the POST request body.
 
@@ -60,14 +63,16 @@ def classify(idx=None):
             raise exceptions.BadRequest(e)
     elif request.method == 'GET':
         try:
-            img_array = mnist.get_test_image(int(idx))
+            img_array = mnist.get_test_image(idx)
         except IndexError as e:
             raise exceptions.NotFound(e)
 
+    # ValueErrors are thrown for improperly sized input
     try:
         prediction = model.classify(img_array)
     except ValueError as e:
         raise exceptions.BadRequest(e)
+
     max_class = np.argmax(prediction)
     elapsed_time = datetime.datetime.now() - start_time
 
@@ -81,6 +86,7 @@ def classify(idx=None):
 
 
 @app.route('/mnist/image/<idx>')
+@use_kwargs({'idx': fields.Integer(location='view_args', minimum=0, required=True)})
 def get_image(idx):
     """Access individual images in the MNIST dataset.
 
@@ -95,11 +101,9 @@ def get_image(idx):
         404: File Not Found because of invalid index
     """
     try:
-        img_array = mnist.get_test_image(int(idx))
+        img_array = mnist.get_test_image(idx)
     except IndexError as e:
         raise exceptions.NotFound(e)
-    except ValueError as e:
-        raise exceptions.BadRequest(e)
 
     img = Image.fromarray(img_array)
     img_io = BytesIO()
@@ -110,6 +114,7 @@ def get_image(idx):
 
 
 @app.route('/mnist/label/<idx>')
+@use_kwargs({'idx': fields.Integer(location='view_args', minimum=0, required=True)})
 def get_image_label(idx):
     """Access the label of individual image in the MNIST dataset.
 
@@ -124,11 +129,9 @@ def get_image_label(idx):
         404: File Not Found because of invalid index
     """
     try:
-        img_label = mnist.get_test_label(int(idx))
+        img_label = mnist.get_test_label(idx)
     except IndexError as e:
         raise exceptions.NotFound(e)
-    except ValueError as e:
-        raise exceptions.BadRequest(e)
 
     return jsonify({
         'label': img_label

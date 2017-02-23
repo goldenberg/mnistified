@@ -27,6 +27,16 @@ def test_get_images(idx, client):
     assert res.data == get_image_bytes('mnist/{}.jpg'.format(idx))
 
 
+@pytest.mark.parametrize('idx,expected_label', [
+    (7, 9),
+    (42, 4),
+])
+def test_get_label(client, idx, expected_label):
+    res = client.get('/mnist/label/{}'.format(idx))
+    assert res.status_code == 200
+    assert res.json['label'] == expected_label
+
+
 def test_get_missing_image(client):
     res = client.get('/mnist/image/100000000')
     assert res.status_code == 404
@@ -34,7 +44,7 @@ def test_get_missing_image(client):
 
 def test_get_non_integer_image(client):
     res = client.get('/mnist/image/foobar')
-    assert res.status_code == 400
+    assert res.status_code == 422
 
 
 @pytest.mark.parametrize('fname,expected_label', [
