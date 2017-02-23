@@ -17,7 +17,8 @@ mnist = datasets.MNIST()
 # Initialize the model and load stored weights
 model = CNNModel()
 
-# TODO: config this?
+# XXX: In a production implementation, I'd make this a configurable variable
+# managed by our configuration management system.
 model.load_weights(MNIST_DEFAULT_WEIGHTS_PATH)
 
 

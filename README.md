@@ -64,7 +64,6 @@ We output the prediction, the elapsed wall time to evaluate the model, as well
 as the probabilities outputted by the model for debugging. Some sample images
 are available at `tests/fixtures/mnist` in various file formats.
 
-TODO: make sure paths are right
 ```
 curl --data-binary @tests/fixtures/mnist/7.png -X POST "http://127.0.0.1:5000/mnist/classify" --header "Content-Type:image/png"
 {

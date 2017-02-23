@@ -1,3 +1,7 @@
+"""Run to train the CNN Model. Sample invocation:
+
+python mnistified/train.py --weights=weights.hdf5 --num-epochs=4 --batch-size=256
+"""
 import argparse
 from mnistified.model import CNNModel
 
